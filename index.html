@@ -3,152 +3,180 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quiniela Electoral 2026 - Google Sheets</title>
+    <title>Quiniela Electoral 2026</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f0f2f5; padding: 20px; color: #333; }
-        .container { max-width: 600px; margin: auto; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
-        h2 { text-align: center; color: #1a73e8; margin-top: 0; }
+        :root { --primary: #1a73e8; --success: #27ae60; --error: #e74c3c; }
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f8f9fa; margin: 0; padding: 20px; }
+        .container { max-width: 650px; margin: auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
         
-        .header-info { position: sticky; top: 0; background: #fff; padding: 15px 0; border-bottom: 2px solid #eee; margin-bottom: 20px; z-index: 10; }
-        .status-bar { display: flex; justify-content: space-between; font-weight: bold; font-size: 1.2em; }
-        .remaining { color: #f39c12; }
-        .total { color: #27ae60; }
-        .error-msg { color: #e74c3c; font-size: 0.9em; display: none; margin-top: 10px; font-weight: bold; }
+        /* Instrucciones */
+        .instructions { background: #e8f0fe; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 5px solid var(--primary); }
+        .instructions h3 { margin-top: 0; color: var(--primary); }
 
-        .form-group { margin-bottom: 20px; }
-        label { display: block; margin-bottom: 8px; font-weight: 600; color: #555; }
-        input[type="text"] { width: 100%; padding: 12px; border: 2px solid #dfe1e5; border-radius: 8px; box-sizing: border-box; font-size: 1em; }
-        input[type="number"] { width: 90px; padding: 8px; border: 1px solid #ccc; border-radius: 5px; text-align: right; font-size: 1em; }
+        /* Formulario */
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: 600; color: #444; }
+        input[type="text"], input[type="email"], input[type="tel"] { 
+            width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; 
+        }
+
+        .header-info { position: sticky; top: 0; background: white; padding: 15px 0; border-bottom: 2px solid #eee; margin-bottom: 20px; z-index: 10; }
+        .status-bar { display: flex; justify-content: space-between; font-weight: bold; font-size: 1.1em; }
         
-        .candidate-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #f1f1f1; }
-        .candidate-row label { flex: 1; margin: 0; font-weight: normal; }
+        .candidate-row { display: flex; align-items: center; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #f1f1f1; }
+        input[type="number"] { width: 85px; padding: 8px; text-align: right; border: 1px solid #ccc; border-radius: 4px; }
 
-        button { width: 100%; padding: 15px; background-color: #1a73e8; color: white; border: none; border-radius: 8px; font-size: 1.1em; font-weight: bold; cursor: pointer; margin-top: 25px; transition: all 0.3s ease; }
-        button:hover { background-color: #1557b0; box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
-        button:disabled { background-color: #dadce0; cursor: not-allowed; box-shadow: none; }
+        button { width: 100%; padding: 15px; background: var(--primary); color: white; border: none; border-radius: 8px; font-size: 1.1em; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        button:disabled { background: #ccc; }
 
-        #loading { display: none; text-align: center; margin-top: 10px; color: #666; font-style: italic; }
+        /* Sección de Resultado / Impresión */
+        #success-view { display: none; text-align: center; }
+        .print-receipt { text-align: left; background: #fff; border: 1px dashed #333; padding: 20px; margin: 20px 0; }
+        
+        @media print {
+            body * { visibility: hidden; }
+            #success-view, #success-view * { visibility: visible; }
+            #success-view { position: absolute; left: 0; top: 0; width: 100%; }
+            .no-print { display: none; }
+        }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>🗳️ Mi Quiniela Electoral</h2>
-    
-    <div class="form-group">
-        <label for="participantName">Tu Nombre:</label>
-        <input type="text" id="participantName" placeholder="Ej. Juan Pérez" required>
-    </div>
-
-    <div class="header-info">
-        <div class="status-bar">
-            <span>Restante: <span id="remainingValue" class="remaining">100.00</span>%</span>
-            <span>Total: <span id="totalValue" class="total">0.00</span>%</span>
+    <div id="form-view">
+        <h2>🗳️ Quiniela Presidencial 2026 Costa Rica</h2>
+        
+        <div class="instructions">
+            <h3>Instrucciones:</h3>
+            <ul>
+                <li>Se reciben quinielas <b>máximo hasta el Sábado 31 de enero a media noche.</b></li>
+				<li>El costo de la quiniela es de 5000 colones que <b>deben ser pagados al SINPE 88117236</b> antes del Sábado 31 de enero a media noche.</li>
+				<li>Puede participar las veces que quiera al costo indicado por quiniela.</li>
+                <li>Distribuya el <b>100%</b> de los votos entre las 11 opciones. Es posible colocar hasta dos decimales.</li>
+                <li>Para determinar el ganador se utiliza una ponderación proporcional al voto, donde la precisión de su predicción se multiplica directamente por el porcentaje real de votos que obtuvo el candidato, según el TSE.</li>
+				<li>El ganador se llevará el monto completo de los participantes.</li>
+                <li>El botón de envío se activará solo cuando el 100% se haya distribuido.</li>
+            </ul>
         </div>
-        <p id="alertMessage" class="error-msg">⚠️ La suma debe ser exactamente 100% para poder enviar.</p>
+
+        <div class="form-group">
+            <label>Nombre Completo:</label>
+            <input type="text" id="participantName" required>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <div class="form-group">
+                <label>Correo Electrónico:</label>
+                <input type="email" id="participantEmail" required>
+            </div>
+            <div class="form-group">
+                <label>Teléfono:</label>
+                <input type="tel" id="participantPhone" required>
+            </div>
+        </div>
+
+        <div class="header-info">
+            <div class="status-bar">
+                <span>Restante: <span id="remainingValue" style="color:var(--error)">100.00</span>%</span>
+                <span>Total: <span id="totalValue">0.00</span>%</span>
+            </div>
+        </div>
+
+        <form id="quinielaForm">
+            <div id="candidatesContainer"></div>
+            <button type="submit" id="submitBtn" disabled style="margin-top:20px;">Enviar y Generar Comprobante</button>
+        </form>
     </div>
 
-    <form id="quinielaForm">
-        <div id="candidatesContainer">
+    <div id="success-view">
+        <h2 style="color: var(--success);">¡Envío Exitoso!</h2>
+        <p>Su quiniela ha sido registrada en el sistema.</p>
+        
+        <div id="receipt" class="print-receipt">
             </div>
 
-        <button type="submit" id="submitBtn" disabled>Enviar a Google Sheets</button>
-        <div id="loading">Enviando datos, por favor espera...</div>
-    </form>
+        <button onclick="window.print()" style="background: #333;" class="no-print">🖨️ Imprimir Comprobante</button>
+        <button onclick="location.reload()" style="background: #666; margin-top: 10px;" class="no-print">Hacer otra quiniela</button>
+    </div>
 </div>
 
 <script>
-    // Configuración: PEGA AQUÍ TU URL DE GOOGLE APPS SCRIPT
-    const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwXr-SV2S0skUtAHzX8JQ7W12dtKqJ6VhSFDzamVFiPb2yld50eLHGhxy4JjLg8Ngw/exec';
+    const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbw9cHDcQulU2qWV-vXsSvtkBo_MtNehQn144IwBMp-tdBG9A2mdfs_EYtTPB3Sf022r/exec'; // <--- PEGA TU URL DE GOOGLE AQUÍ
 
     const candidates = [
-        "Candidato A", "Candidato B", "Candidato C", "Candidato D",
-        "Candidato E", "Candidato F", "Candidato G", "Candidato H",
-        "Candidato I", "Candidato J", "Candidato K"
+        "Laura Fernández","Álvaro Ramos","Claudia Dobles","Ariel Robles","Fabricio Alvarado","José Aguilar Berrocal","Juan Carlos Hidalgo","Natalia Díaz","Todos los demás candidatos","Votos en blanco","Votos nulo"
     ];
 
     const container = document.getElementById('candidatesContainer');
-    const totalDisplay = document.getElementById('totalValue');
-    const remainingDisplay = document.getElementById('remainingValue');
-    const submitBtn = document.getElementById('submitBtn');
-    const alertMessage = document.getElementById('alertMessage');
-    const loadingDiv = document.getElementById('loading');
-
-    // Generar campos de entrada
-    candidates.forEach((name, index) => {
+    
+   
+    candidates.forEach(name => {
         const div = document.createElement('div');
         div.className = 'candidate-row';
-        div.innerHTML = `
-            <label>${name}</label>
-            <input type="number" class="candidate-input" step="0.01" min="0" max="100" placeholder="0.00">
-        `;
+        div.innerHTML = `<label>${name}</label><input type="number" class="candidate-input" step="0.01" min="0" placeholder="0.0">`;
         container.appendChild(div);
     });
 
     const inputs = document.querySelectorAll('.candidate-input');
 
-    function calculateTotals() {
+    // Lógica de cálculo
+    function calculate() {
         let total = 0;
-        inputs.forEach(input => {
-            total += parseFloat(input.value) || 0;
-        });
-
+        inputs.forEach(i => total += parseFloat(i.value) || 0);
         total = Math.round(total * 100) / 100;
-        const remaining = Math.round((100 - total) * 100) / 100;
-
-        totalDisplay.innerText = total.toFixed(2);
-        remainingDisplay.innerText = remaining.toFixed(2);
-
-        // Validar si es exactamente 100
-        const isCorrect = Math.abs(total - 100) < 0.001;
-        submitBtn.disabled = !isCorrect;
         
-        if (total > 100) {
-            alertMessage.style.display = 'block';
-            totalDisplay.style.color = '#e74c3c';
-        } else {
-            alertMessage.style.display = isCorrect ? 'none' : 'none';
-            totalDisplay.style.color = isCorrect ? '#27ae60' : '#333';
-        }
+        document.getElementById('totalValue').innerText = total.toFixed(2);
+        document.getElementById('remainingValue').innerText = (100 - total).toFixed(2);
+        
+        const isCorrect = Math.abs(total - 100) < 0.01;
+        document.getElementById('submitBtn').disabled = !isCorrect;
+        document.getElementById('totalValue').style.color = isCorrect ? 'var(--success)' : 'black';
     }
 
-    inputs.forEach(input => {
-        input.addEventListener('input', calculateTotals);
-    });
+    inputs.forEach(i => i.addEventListener('input', calculate));
 
-    // Envío de datos
+    // Envío y Generación de Recibo
     document.getElementById('quinielaForm').addEventListener('submit', async (e) => {
         e.preventDefault();
-        
-        const name = document.getElementById('participantName').value;
-        if (!name) return alert("Ingresa tu nombre");
+        const btn = document.getElementById('submitBtn');
+        btn.disabled = true;
+        btn.innerText = "Enviando...";
 
-        const votos = Array.from(inputs).map(i => parseFloat(i.value) || 0);
-
-        // Bloquear interfaz
-        submitBtn.disabled = true;
-        loadingDiv.style.display = 'block';
+        const data = {
+            participante: document.getElementById('participantName').value,
+            email: document.getElementById('participantEmail').value,
+            telefono: document.getElementById('participantPhone').value,
+            votos: Array.from(inputs).map(i => i.value || 0)
+        };
 
         try {
-            // Enviamos los datos como JSON a Google Apps Script
-            const response = await fetch(WEB_APP_URL, {
+            await fetch(WEB_APP_URL, {
                 method: 'POST',
-                mode: 'no-cors', // Importante para Google Apps Script
-                cache: 'no-cache',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ participante: name, votos: votos })
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'text/plain' },
+                body: JSON.stringify(data)
             });
 
-            // Con no-cors no podemos leer la respuesta, pero si no hay error, asumimos éxito
-            alert(`¡Excelente ${name}! Tus datos se han enviado a la hoja de cálculo.`);
-            document.getElementById('quinielaForm').reset();
-            calculateTotals();
+            // Mostrar vista de impresión
+            document.getElementById('form-view').style.display = 'none';
+            document.getElementById('success-view').style.display = 'block';
             
-        } catch (error) {
-            console.error("Error:", error);
-            alert("Error al conectar con Google Sheets.");
-        } finally {
-            loadingDiv.style.display = 'none';
+            // Construir el recibo
+            let receiptHTML = `
+                <p><strong>Participante:</strong> ${data.participante}</p>
+                <p><strong>Email:</strong> ${data.email} | <strong>Tel:</strong> ${data.telefono}</p>
+                <hr>
+                <table style="width:100%">
+                    ${candidates.map((name, i) => `<tr><td>${name}</td><td style="text-align:right"><b>${data.votos[i]}%</b></td></tr>`).join('')}
+                </table>
+                <hr>
+                <p style="text-align:center"><i>Fecha de registro: ${new Date().toLocaleString()}</i></p>
+            `;
+            document.getElementById('receipt').innerHTML = receiptHTML;
+
+        } catch (err) {
+            alert("Error al enviar. Verifica tu conexión.");
+            btn.disabled = false;
         }
     });
 </script>

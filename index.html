@@ -137,8 +137,12 @@
         const emailVal = document.getElementById('participantEmail').value.trim();
         const phoneVal = document.getElementById('participantPhone').value.trim();
         const fieldsFilled = nameVal !== "" && emailVal !== "" && phoneVal !== "";
+
 		
-        document.getElementById('submitBtn').disabled = !isCorrect;
+        const btn = document.getElementById('submitBtn');
+        btn.disabled = !(isCorrect && fieldsFilled);
+		
+        // document.getElementById('submitBtn').disabled = !isCorrect;
         document.getElementById('totalValue').style.color = isCorrect ? 'var(--success)' : 'black';
     }
 
@@ -193,6 +197,7 @@
 
 </body>
 </html>
+
 
 
 

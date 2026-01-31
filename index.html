@@ -103,7 +103,7 @@
 </div>
 
 <script>
-    const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbw9cHDcQulU2qWV-vXsSvtkBo_MtNehQn144IwBMp-tdBG9A2mdfs_EYtTPB3Sf022r/exec'; // <--- PEGA TU URL DE GOOGLE AQUÍ
+    const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbw9cHDcQulU2qWV-vXsSvtkBo_MtNehQn144IwBMp-tdBG9A2mdfs_EYtTPB3Sf022r/exec';
 
     const candidates = [
         "Laura Fernández","Álvaro Ramos","Claudia Dobles","Ariel Robles","Fabricio Alvarado","José Aguilar Berrocal","Juan Carlos Hidalgo","Natalia Díaz","Todos los demás candidatos","Votos en blanco","Votos nulo"
@@ -131,6 +131,13 @@
         document.getElementById('remainingValue').innerText = (100 - total).toFixed(2);
         
         const isCorrect = Math.abs(total - 100) < 0.01;
+		
+		// Verificar campos contactos
+        const nameVal = document.getElementById('participantName').value.trim();
+        const emailVal = document.getElementById('participantEmail').value.trim();
+        const phoneVal = document.getElementById('participantPhone').value.trim();
+        const fieldsFilled = nameVal !== "" && emailVal !== "" && phoneVal !== "";
+		
         document.getElementById('submitBtn').disabled = !isCorrect;
         document.getElementById('totalValue').style.color = isCorrect ? 'var(--success)' : 'black';
     }
@@ -186,5 +193,6 @@
 
 </body>
 </html>
+
 
 
